@@ -47,6 +47,21 @@ class DayTitle extends StatelessWidget {
   }
 }
 
+class EventWidget extends StatelessWidget {
+  const EventWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.amber,
+      width: double.maxFinite,
+      padding: EdgeInsets.only(left: 3.0),
+      height: 50.0,
+      child: Text("Uwu"),
+    );
+  }
+}
+
 class CalendarColumn extends StatelessWidget {
   const CalendarColumn({super.key});
 
@@ -68,7 +83,13 @@ class CalendarColumn extends StatelessWidget {
       children: [
         for (int day = 0; day < 24; day += 1)
           TableRow(
-            children: [for (int i = 0; i < 5; i += 1) SizedBox(height: 50.0)],
+            children: [
+              for (int i = 0; i < 5; i += 1)
+                if (day % (i + 1) == 0)
+                  SizedBox(height: 50.0)
+                else
+                  EventWidget(),
+            ],
           ),
       ],
     );
@@ -85,15 +106,7 @@ class CalendarGrid extends StatelessWidget {
         Row(
           children: [
             HourHint(),
-            Expanded(
-              flex: 1,
-              child: Stack(
-                children: [
-                  Container(color: Colors.amber, width: 10.0, height: 10.0),
-                  CalendarColumn(),
-                ],
-              ),
-            ),
+            Expanded(flex: 1, child: Stack(children: [CalendarColumn()])),
           ],
         ),
       ],

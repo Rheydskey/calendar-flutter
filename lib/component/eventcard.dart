@@ -1,13 +1,18 @@
+import 'package:calendar/libcalendar/event.dart';
 import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {
-  const EventCard({super.key});
+  final Event event;
+  const EventCard(this.event, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Card.outlined(
-      shadowColor: Colors.transparent,
-      color: Color(0xFF6750a4),
+    return Container(
+      margin: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Color(0xFF6750a4),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
       child: Row(
         spacing: 4.0,
         children: [
@@ -29,8 +34,11 @@ class EventCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Bonjour", style: TextStyle(color: Colors.white)),
-              Text("10h -> 12h", style: TextStyle(color: Colors.white)),
+              Text(event.name, style: TextStyle(color: Colors.white)),
+              Text(
+                "${event.start.hour}h -> ${event.end.hour}h",
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
         ],

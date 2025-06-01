@@ -1,45 +1,174 @@
+import 'dart:async';
+
 import 'package:calendar/component/eventcard.dart';
+import 'package:calendar/libcalendar/event.dart' as evt;
+import 'package:calendar/libcalendar/ics.dart';
 import 'package:calendar/view/desktopview.dart';
 import 'package:flutter/material.dart';
 
+const hourSize = 60.0;
+const minuteSize = hourSize / Duration.minutesPerHour;
+
+class HourDivider extends StatelessWidget {
+  const HourDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: hourSize - 1,
+      children: [
+        SizedBox(height: 10.0),
+        for (var i = 1; i <= 24; i++)
+          Divider(
+            height: 1.0,
+            indent: 10,
+            endIndent: 10,
+            color: Color(0xFFeaddff),
+          ),
+      ],
+    );
+  }
+}
+
+class EventColumn extends StatelessWidget {
+  final List<evt.Event> events;
+  const EventColumn(this.events, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: 2,
+      children: [
+        Stack(
+          children: [
+            for (var e in events)
+              Container(
+                margin: EdgeInsets.only(
+                  top:
+                      (e.start.hour) * hourSize + (e.start.minute) * minuteSize,
+                ),
+                height:
+                    (e.end.hour - e.start.hour + e.end.minute - e.start.minute)
+                        .toDouble() *
+                    hourSize,
+                child: EventCard(e),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class CurrentHour extends StatefulWidget {
+  const CurrentHour({super.key});
+
+  @override
+  State<CurrentHour> createState() => _CurrentHourState();
+}
+
+class _CurrentHourState extends State<CurrentHour> {
+  DateTime dt = DateTime.now();
+  late Timer update;
+
+  void updateTime(e) {
+    setState(() {
+      dt = DateTime.now();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // SUBOPTIMIZE
+    update = Timer.periodic(Duration(seconds: 1), updateTime);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    update.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: dt.hour * hourSize + dt.minute * minuteSize),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.horizontal(
+                left: Radius.elliptical(10.0, 10.0),
+                right: Radius.elliptical(10.0, 10.0),
+              ),
+            ),
+
+            padding: EdgeInsets.all(2.0),
+            child: Text(
+              "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          Expanded(
+            child: Divider(color: Colors.red, height: 2.0, thickness: 2.0),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CurrentHourDivider extends StatefulWidget {
+  const CurrentHourDivider({super.key});
+
+  @override
+  State<CurrentHourDivider> createState() => _CurrentHourDividerState();
+}
+
+class _CurrentHourDividerState extends State<CurrentHourDivider> {
+  @override
+  Widget build(BuildContext context) {
+    DateTime dt = DateTime.now();
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(
+              top: dt.hour * hourSize + dt.minute * minuteSize,
+            ),
+            height: 24.0,
+            child: Divider(color: Colors.red, thickness: 1.0),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DayColumn extends StatelessWidget {
-  const DayColumn({super.key});
+  final List<evt.Event> events;
+  const DayColumn(this.events, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Stack(
           children: [
-            Column(children: [HourHint()]),
-            Expanded(
-              flex: 1,
-              child: Stack(
-                children: [
-                  Column(
-                    spacing: 59.0,
-                    children: [
-                      SizedBox(height: 10.0),
-                      for (var i = 1; i <= 24; i++)
-                        Divider(
-                          height: 1.0,
-                          indent: 10,
-                          endIndent: 10,
-                          color: Color(0xFFeaddff),
-                        ),
-                    ],
-                  ),
-                  Column(
-                    spacing: 2,
-                    children: [
-                      for (var i = 1; i <= 10; i++)
-                        SizedBox(height: 58, child: EventCard()),
-                    ],
-                  ),
-                ],
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(children: [HourHint()]),
+                Expanded(
+                  flex: 1,
+                  child: Stack(children: [HourDivider(), EventColumn(events)]),
+                ),
+              ],
             ),
+            CurrentHour(),
           ],
         ),
       ],
@@ -53,35 +182,13 @@ String format() {
 }
 
 class MobileCalendarView extends StatelessWidget {
-  const MobileCalendarView({super.key});
+  final List<evt.Event> event;
+
+  const MobileCalendarView(this.event, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return TabBarView(
-      children: <Widget>[
-        DayColumn(),
-        ListView(
-          children: [
-            Row(children: [HourHint()]),
-          ],
-        ),
-        ListView(
-          children: [
-            Row(children: [HourHint()]),
-          ],
-        ),
-        ListView(
-          children: [
-            Row(children: [HourHint()]),
-          ],
-        ),
-        ListView(
-          children: [
-            Row(children: [HourHint()]),
-          ],
-        ),
-      ],
-    );
+    return DayColumn(event);
   }
 }
 
@@ -139,16 +246,16 @@ class Mobileview extends StatefulWidget {
 }
 
 class _MobileviewState extends State<Mobileview> {
-  int selectedview = 1;
+  int selectedview = 0;
   Tab? tab;
+  late Future<evt.Events> events;
 
-  static List<String> jours = [
-    format(),
-    format(),
-    format(),
-    format(),
-    format(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    events = Ics().getEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,13 +296,26 @@ class _MobileviewState extends State<Mobileview> {
         actionsPadding: EdgeInsets.all(10.0),
       ),
       drawer: Drawer(child: Text("Truc")),
-      body: () {
-        if (selectedview == 0) {
-          return MobileCalendarView();
-        } else {
-          return MobileTrackerView();
-        }
-      }(),
+      body: Center(
+        child: FutureBuilder<evt.Events>(
+          future: events,
+          builder: (context, snapshot) {
+            if (selectedview == 0) {
+              if (snapshot.hasData) {
+                return MobileCalendarView(
+                  snapshot.data!.getEventOfDay(DateTime.now()),
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              return const CircularProgressIndicator();
+            } else {
+              return MobileTrackerView();
+            }
+          },
+        ),
+      ),
     );
   }
 }

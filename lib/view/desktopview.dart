@@ -1,4 +1,3 @@
-import 'package:calendar/component/eventcard.dart';
 import 'package:flutter/material.dart';
 
 class Event extends StatelessWidget {
@@ -41,7 +40,7 @@ class EventWidget extends StatelessWidget {
         width: double.maxFinite,
         padding: EdgeInsets.only(left: 3.0),
         height: 50.0,
-        child: EventCard(),
+        child: Text("TODO"),
       ),
     );
   }
@@ -120,13 +119,17 @@ class HourHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4.0),
-      child: Column(
+      child: Stack(
         children: [
-          for (int day = 0; day < 24; day += 1)
-            SizedBox(
-              height: 60.0,
-              child: Text('${day.toString().padLeft(2, '0')}h'),
-            ),
+          Column(
+            children: [
+              for (int day = 0; day < 24; day += 1)
+                SizedBox(
+                  height: 60.0,
+                  child: Text('${day.toString().padLeft(2, '0')}h'),
+                ),
+            ],
+          ),
         ],
       ),
     );

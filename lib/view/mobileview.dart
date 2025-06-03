@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:calendar/component/eventcard.dart';
 import 'package:calendar/libcalendar/event.dart' as evt;
 import 'package:calendar/libcalendar/ics.dart';
+import 'package:calendar/preferences/preferences.dart';
 import 'package:calendar/view/desktopview.dart';
 import 'package:flutter/material.dart';
 
@@ -248,16 +249,53 @@ class Mobileview extends StatefulWidget {
 class _MobileviewState extends State<Mobileview> {
   int selectedview = 0;
   Tab? tab;
-  late Future<evt.Events> events;
+  evt.Events? events;
+  Preferences? prefs;
+
+  Future<void> getPrefs() async {
+    prefs = await Preferences.getInstance();
+  }
+
+  Future<void> getEvent() async {
+    /*prefs!.prefs.setString(
+      "url",
+      "",
+    );*/
+
+    /*prefs!.prefs.setString(
+      "auth",
+      "",
+    );*/
+
+    var url = prefs!.url()!;
+    var auth = prefs!.auth()!;
+    var events = await Ics(url, auth).getEvents();
+    setState(() {
+      this.events = events;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    events = Ics().getEvents();
+    getPrefs().whenComplete(() {
+      getEvent();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var subview = () {
+      if (selectedview == 0) {
+        if (events == null) {
+          return const CircularProgressIndicator();
+        }
+
+        return MobileCalendarView(events!.getEventOfDay(DateTime.now()));
+      }
+
+      return MobileTrackerView();
+    }();
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedview,
@@ -296,26 +334,7 @@ class _MobileviewState extends State<Mobileview> {
         actionsPadding: EdgeInsets.all(10.0),
       ),
       drawer: Drawer(child: Text("Truc")),
-      body: Center(
-        child: FutureBuilder<evt.Events>(
-          future: events,
-          builder: (context, snapshot) {
-            if (selectedview == 0) {
-              if (snapshot.hasData) {
-                return MobileCalendarView(
-                  snapshot.data!.getEventOfDay(DateTime.now()),
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-
-              return const CircularProgressIndicator();
-            } else {
-              return MobileTrackerView();
-            }
-          },
-        ),
-      ),
+      body: Center(child: subview),
     );
   }
 }

@@ -7,6 +7,8 @@ class Ics implements Provider {
   String url = "localhost:3000";
   String creds = "";
 
+  Ics(this.url, this.creds);
+
   @override
   Future<Events> getEvents() async {
     final response = await http.get(

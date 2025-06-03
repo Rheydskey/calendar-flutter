@@ -31,15 +31,18 @@ class EventCard extends StatelessWidget {
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(event.name, style: TextStyle(color: Colors.white)),
-              Text(
-                "${event.start.hour}h -> ${event.end.hour}h",
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 5.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(event.name, style: TextStyle(color: Colors.white)),
+                Text(
+                  "${event.start.hour}h${event.start.minute} - ${event.end.hour}h${event.end.minute}",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
           ),
         ],
       ),

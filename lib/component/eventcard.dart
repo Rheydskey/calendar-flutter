@@ -8,7 +8,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(5),
+      margin: EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
         color: Color(0xFF6750a4),
         borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -37,10 +37,11 @@ class EventCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(event.name, style: TextStyle(color: Colors.white)),
-                Text(
-                  "${event.start.hour}h${event.start.minute} - ${event.end.hour}h${event.end.minute}",
-                  style: TextStyle(color: Colors.white),
-                ),
+                if (event.end.difference(event.start).inMinutes >= 60)
+                  Text(
+                    "${event.start.hour}h${event.start.minute.toString().padLeft(2, '0')} - ${event.end.hour}h${event.end.minute.toString().padLeft(2, '0')}",
+                    style: TextStyle(color: Colors.white),
+                  ),
               ],
             ),
           ),

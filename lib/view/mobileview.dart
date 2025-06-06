@@ -46,12 +46,15 @@ class EventColumn extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(
                   top:
-                      (e.start.hour) * hourSize + (e.start.minute) * minuteSize,
+                      10.0 +
+                      (e.start.hour) * hourSize +
+                      (e.start.minute) * minuteSize,
                 ),
                 height:
-                    (e.end.hour - e.start.hour + e.end.minute - e.start.minute)
-                        .toDouble() *
-                    hourSize,
+                    (e.end.difference(e.start).inMinutes / 60).toInt() *
+                        hourSize +
+                    (e.end.difference(e.start).inMinutes % 60).toInt() *
+                        minuteSize,
                 child: EventCard(e),
               ),
           ],

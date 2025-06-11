@@ -40,3 +40,13 @@ class Ics implements Provider {
     );
   }
 }
+
+class FakeIcs implements Provider {
+  @override
+  Future<Events> getEvents() async {
+    var a = DateTime.now();
+    var b = DateTime(a.year, a.month, a.day);
+    var c = b.add(Duration(hours: 2));
+    return Events(events: [Event(name: "Test", start: b, end: c)]);
+  }
+}

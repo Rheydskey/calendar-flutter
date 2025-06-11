@@ -268,11 +268,13 @@ class _MobileviewState extends State<Mobileview> {
     /*prefs!.prefs.setString(
       "auth",
       "",
-    );*/
+    );
 
     var url = prefs!.url()!;
     var auth = prefs!.auth()!;
     var events = await Ics(url, auth).getEvents();
+    */
+    events = await FakeIcs().getEvents();
     setState(() {
       this.events = events;
     });

@@ -1,4 +1,6 @@
-import 'package:calendar/view/mobileview.dart';
+import 'package:calendar/libcalendar/event.dart';
+import 'package:calendar/view/mobile/calendar/mobile.dart';
+import 'package:calendar/view/mobile/calendar/planner.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -8,7 +10,6 @@ void main() {
 class App extends StatelessWidget {
   const App({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +19,7 @@ class App extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Mobileview(),
+      home: MobileView(),
     );
   }
 }
